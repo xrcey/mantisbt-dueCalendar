@@ -1,0 +1,8 @@
+<?php
+/** Japanese (日本語)
+ */
+
+$s_plugin_dueCalender_config = 'Config';
+$s_plugin_dueCalender_title = 'Due Calendar';
+$s_plugin_dueCalender_today_color = 'Today's Color';
+$s_plugin_dueCalender_display_date_fmt = 'Date format';

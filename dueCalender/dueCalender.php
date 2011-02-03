@@ -20,6 +20,7 @@ class dueCalenderPlugin extends MantisPlugin  {
 		$this->author = 'priereluna';
 		$this->contact = 'priereluna@gmail.com';
         $this->url = 'http://app.priereluna.net/mantis/';
+        
 	}
 
 	/**
@@ -37,7 +38,7 @@ class dueCalenderPlugin extends MantisPlugin  {
 		spl_autoload_register( array( 'dueCalenderPlugin', 'autoload' ) );
 		
 		$t_path = config_get_global('plugin_path' ). plugin_get_current() . DIRECTORY_SEPARATOR . 'core' . DIRECTORY_SEPARATOR;
-
+        require $t_path . DIRECTORY_SEPARATOR . "core.php";
 		set_include_path(get_include_path() . PATH_SEPARATOR . $t_path);
 	}
 	
@@ -49,6 +50,7 @@ class dueCalenderPlugin extends MantisPlugin  {
 	
     function hooks() {
         $hooks = array(
+            'EVENT_LAYOUT_PAGE_HEADER'=>"aaaaaaaaaaaa",
             'EVENT_MENU_MAIN' => 'add_menu',
         );
         return $hooks;

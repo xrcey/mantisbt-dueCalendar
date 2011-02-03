@@ -7,78 +7,13 @@ require_once( 'date_api.php' );
 require_once( 'string_api.php' );
 require_once( 'last_visited_api.php' );
 
-function pr($a){
-    echo "<pre>";
-    print_r($a);
-    echo '</pre>';
-}
-
-function get_calendar_array($month = 0, $year = 0){
-    $month = ($month >= 1 && $month <= 12) ? (int)$month: date('m', time());
-    $year = (1970 <= $year && $year <= 2037)? (int)$year: date('Y', time());
-
-    $current_oneday = mktime(0, 0, 0, $month, 1, $year);
-
-    $nowFinalmon = date('t', $current_oneday); //月末日
-    $nowStartday = date('w', $current_oneday); //月初曜日
-    $nowFinalday = date('w', mktime(0, 0, 0, $month, $nowFinalmon, $year)); //月末曜日
-    $month_diff = 7 - $nowFinalday - 1; //当月末の余りの日数
-    $Array_month = array();
-    
-    // 月初を埋める
-    for ($i = $nowStartday ; $i > 0 ; --$i) {
-        $index = $nowStartday - $i;
-        $timestamp = mktime(0, 0, 0, $month, 1 - $i, $year);
-        $current = getdate( $timestamp );
-        $Array_month[$index] = array(
-            'year'  => $current['year'], 
-            'month' => $current['mon'],
-            'day'   => $current['mday'],
-            'week'  => $current['wday'],
-            'now'   => -1,
-            'timestamp' => $timestamp,
-            );
-    } 
-    // 今月を埋める
-    $index = $nowStartday;
-    $current = array('year'  => date('Y', $current_oneday), 'month' => date('n', $current_oneday));
-    for($i = 1 ; $i <= $nowFinalmon ; ++$i) {
-        $timestamp = mktime(0, 0, 0, $month, $i, $year);
-        $Array_month[$index] = array(
-            'year'  => $current['year'],
-            'month' => $current['month'],
-            'day'   => $i,
-            'week'  => date('w', $timestamp),
-            'now'   => 0,
-            'timestamp' => $timestamp,
-            );
-        ++$index;
-    } 
-    // 月末を埋める    $n = 1;
-    $next_month = $month + 1;
-    $current = array('year'  => date('Y', mktime(0,0,0,$next_month, 1, $year)),
-                      'month' => date('n', mktime(0,0,0,$next_month, 1, $year))
-                      );
-    for($i = 1;$i <= $month_diff ; ++$i) {
-        $timestamp = mktime(0, 0, 0, $next_month, $i, $year);
-        $Array_month[$index] = array(
-            'year'  => $current['year'], 
-            'month' => $current['month'],
-            'day'   => $i,
-            'week'  => date('w', $timestamp),
-            'now'   => 1,
-            'timestamp' => $timestamp,
-            );
-        ++$index;
-    }
-    return $Array_month;
-} 
 $scriptname = plugin_page( 'calender_list.php' );
 $time = time();
 $toyear = date('Y', $time);
 $tomonth = date('m', $time);
 $todate = date('Y-m-d', $time);
 $last_month_day = date('t', mktime(0, 0, 0, $month, 1, $year));
+$plugin_name = plugin_get_current();
 $t_project_id = gpc_get_int( 'project_id', helper_get_current_project() );
 $t_bugnote_table = db_get_table( 'mantis_bugnote_table' );
 $t_bugnote_text_table = db_get_table( 'mantis_bugnote_text_table' );
@@ -86,6 +21,19 @@ $t_bug_table = db_get_table( 'mantis_bug_table' );
 $t_bugnote_order = current_user_get_pref( 'bugnote_order' );
 $year = gpc_get_int( 'start_year', $toyear);
 $month = gpc_get_int( 'start_month', $tomonth);
+
+//options
+if ($act = gpc_get_string('act', '')) {
+    //search form
+    $hidden_roadmap = gpc_get_string('hidden_roadmap', '');
+    $hidden_empty = gpc_get_string('hidden_empty', '');
+    session_set('plugin_'.$plugin_name.'_hidden_roadmap', $hidden_roadmap);
+    session_set('plugin_'.$plugin_name.'_hidden_empty', $hidden_empty);
+} else {
+    $hidden_roadmap = session_get_string('plugin_'.$plugin_name.'_hidden_roadmap', '');
+    $hidden_empty = session_get_string('plugin_'.$plugin_name.'_hidden_empty','');
+}
+
 $t_status_array = MantisEnum::getAssocArrayIndexedByValues( lang_get( 'status_enum_string' ));
 
 //project
@@ -95,13 +43,15 @@ $projects = db_fetch_array( $t_roadmap_result );
 
 //roadmap
 $roadmaps = array();
-$query = 'SELECT * FROM `mantis_project_version_table` WHERE project_id ='.db_param().' AND `date_order` BETWEEN '.db_param().' AND '.db_param().';';
-$t_roadmap_result = db_query_bound($query, array($t_project_id,
-                                                 mktime(0,0,0,$month, 1, $year),
-                                                 mktime(24,59,59,$month, $last_month_day, $year)));
-$roadmap_count = (int) db_num_rows($t_roadmap_result);
-while( $row = db_fetch_array( $t_roadmap_result ) ) {
-    $roadmaps[date('Y-m-d', $row['date_order'])][] = $row;
+if (!$hidden_roadmap) {
+    $query = 'SELECT * FROM `mantis_project_version_table` WHERE project_id ='.db_param().' AND `date_order` BETWEEN '.db_param().' AND '.db_param().';';
+    $t_roadmap_result = db_query_bound($query, array($t_project_id,
+                                                     mktime(0,0,0,$month, 1, $year),
+                                                     mktime(24,59,59,$month, $last_month_day, $year)));
+    $roadmap_count = (int) db_num_rows($t_roadmap_result);
+    while( $row = db_fetch_array( $t_roadmap_result ) ) {
+        $roadmaps[date('Y-m-d', $row['date_order'])][] = $row;
+    }
 }
 
 //due with bug
@@ -152,8 +102,7 @@ table.solid td > .day {
   color:#ccc;
 }
 .today{
-  background-color:<?php echo plugin_config_get("today_color")?>;
-
+    background-color:<?php echo plugin_config_get("today_color")?>;
 }
 .Sun .day{ color:#f33;}
 </style>
@@ -161,26 +110,42 @@ table.solid td > .day {
 <div class="calendar_head">
 <span class="pagetitle"><?php echo $projects['name'] ?> - <?php echo date(plugin_config_get("display_date_fmt"), mktime(0,0,0,$month, 1, $year))?></span>
 <span>
- [<a href="<?php echo $scriptname.'?start_year='.$calendarHandler['prev']['year'].'&start_month='.$calendarHandler['prev']['month'].''?>">前月へ</a>]｜
- [<a href="<?php echo $scriptname.'?start_year='.$calendarHandler['next']['year'].'&start_month='.$calendarHandler['next']['month'].''?>">次月へ</a>]
+ [<a href="<?php echo $scriptname.'?start_year='.$calendarHandler['prev']['year'].'&start_month='.$calendarHandler['prev']['month'].''?>">前月へ</a>] |<!--
+--> [<a href="<?php echo $scriptname.'?start_year='.$calendarHandler['next']['year'].'&start_month='.$calendarHandler['next']['month'].''?>">次月へ</a>]
 </span>
+<span onclick="toggleDisplay('search_form_field')" style="cursor:pointer;">[検索]</span>
 </div>
 
-<table class="calendar solid" width="100%" border="1">
+<div id="search_form_field" style="display:none;">
+<form action="" method="get">
+<input type="hidden" name="page" value="dueCalender/calender_list.php">
+<input type="hidden" name="act" value="search">
+<input type="hidden" name="start_year" value="<?php echo $calendarHandler['current']['year']?>">
+<input type="hidden" name="start_month" value="<?php echo $calendarHandler['current']['month']?>">
+
+<label><input type="checkbox" name="hidden_roadmap" value="on" <?php echo ($hidden_roadmap)? 'checked': '';?>>ロードマップを隠す</label>
+<label><input type="checkbox" name="hidden_empty" value="on" <?php echo ($hidden_empty)? 'checked': '';?>>予定の無いカラムを隠す</label>
+<input type="submit" value="表示">
+</form>
+</div>
+
+<table class="width100" cellspacing="1" style="margin:5px 0;">
 <?php foreach ($calendars as $key => $value):
-if ($value['month'] != $month){
-    continue;
-}
+if ($value['month'] != $month){continue;}
 $h_td_css = ($value['month'] != $month)? "nom" : '';
 $today = date('Y-m-d', $value['timestamp']);
-$columnColor = ($todate == $today)? "today": "";
+$columnColor = ($todate == $today)? plugin_config_get("today_color"): "#f0f0f0";
 $week = date('D', $value['timestamp']);
+
+//empty Columns
+if (empty($roadmaps[$today]) && empty($bugs[$today]) && $hidden_empty){continue;}
 ?>
-<tr>
-<td width="100px">
-<div class="day"><?php  echo $value['day'].' <small>['.$week.']</small>';?></div>
+<tr class="bugnote">
+<td width="100px"class="bugnote-public">
+<div class="day"><span class="small"><?php  echo $value['day'].' ['.$week.']';?></span></div>
 </td>
-<td class="<?php echo $columnColor;?>">
+<td style="background-color:<?php echo $columnColor?>;">
+<div >
 <?php if (!empty($roadmaps[$today])):?>
 <?php foreach($roadmaps[$today] as $roadmap):
 $t_strike_start = $t_strike_end = '';
@@ -219,12 +184,9 @@ if( bug_is_resolved( $v3_bug_id ) ) {
 </div>
 <?php endforeach;?>
 <?php endif;?>
+</div>
 </td></tr>
 <?php endforeach;?>
 </table>
-<?php
-
-
-
-?>
+<?php ?>
 <?php html_page_bottom();?>
