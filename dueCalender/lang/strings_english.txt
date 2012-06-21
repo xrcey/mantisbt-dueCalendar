@@ -1,8 +1,15 @@
 <?php
-/** Japanese (日本語)
+/**
+ * lang: English
  */
 
 $s_plugin_dueCalender_config = 'Config';
 $s_plugin_dueCalender_title = 'Due Calendar';
-$s_plugin_dueCalender_today_color = 'Today's Color';
+$s_plugin_dueCalender_today_color = 'Today\'s Color';
 $s_plugin_dueCalender_display_date_fmt = 'Date format';
+$s_plugin_dueCalender_link_prev_month = 'prev month';
+$s_plugin_dueCalender_link_next_month = 'next month';
+$s_plugin_dueCalender_search = 'Search';
+$s_plugin_dueCalender_search_submit = 'display';
+$s_plugin_dueCalender_search_hide_roadmap = 'Hide Roadmap';
+$s_plugin_dueCalender_search_hide_empty_tickets = 'Hide empty columns';

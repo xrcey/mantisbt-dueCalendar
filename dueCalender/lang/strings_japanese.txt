@@ -1,8 +1,15 @@
 <?php
-/** Japanese (日本語)
+/**
+ * lang: Japanese (日本語)
  */
 
 $s_plugin_dueCalender_config = '設定';
 $s_plugin_dueCalender_title = 'Mantis 期限カレンダー';
 $s_plugin_dueCalender_today_color = '今日の色';
 $s_plugin_dueCalender_display_date_fmt = '日付フォーマット';
+$s_plugin_dueCalender_link_prev_month = '前月へ';
+$s_plugin_dueCalender_link_next_month = '次月へ';
+$s_plugin_dueCalender_search = '検索';
+$s_plugin_dueCalender_search_submit = '表示';
+$s_plugin_dueCalender_search_hide_roadmap = 'ロードマップを隠す';
+$s_plugin_dueCalender_search_hide_empty_tickets = '予定の無いカラムを隠す';

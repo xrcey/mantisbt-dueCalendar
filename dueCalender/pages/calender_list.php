@@ -110,10 +110,10 @@ table.solid td > .day {
 <div class="calendar_head">
 <span class="pagetitle"><?php echo $projects['name'] ?> - <?php echo date(plugin_config_get("display_date_fmt"), mktime(0,0,0,$month, 1, $year))?></span>
 <span>
- [<a href="<?php echo $scriptname.'?start_year='.$calendarHandler['prev']['year'].'&start_month='.$calendarHandler['prev']['month'].''?>">前月へ</a>] |<!--
---> [<a href="<?php echo $scriptname.'?start_year='.$calendarHandler['next']['year'].'&start_month='.$calendarHandler['next']['month'].''?>">次月へ</a>]
+ [<a href="<?php echo $scriptname.'?start_year='.$calendarHandler['prev']['year'].'&start_month='.$calendarHandler['prev']['month'].''?>"><?php echo plugin_lang_get( 'link_prev_month' );?></a>] |<!--
+--> [<a href="<?php echo $scriptname.'?start_year='.$calendarHandler['next']['year'].'&start_month='.$calendarHandler['next']['month'].''?>"><?php echo plugin_lang_get( 'link_next_month' );?></a>]
 </span>
-<span onclick="toggleDisplay('search_form_field')" style="cursor:pointer;">[検索]</span>
+<span onclick="toggleDisplay('search_form_field')" style="cursor:pointer;">[<?php echo plugin_lang_get( 'search' );?>]</span>
 </div>
 
 <div id="search_form_field" style="display:none;">
@@ -123,9 +123,9 @@ table.solid td > .day {
 <input type="hidden" name="start_year" value="<?php echo $calendarHandler['current']['year']?>">
 <input type="hidden" name="start_month" value="<?php echo $calendarHandler['current']['month']?>">
 
-<label><input type="checkbox" name="hidden_roadmap" value="on" <?php echo ($hidden_roadmap)? 'checked': '';?>>ロードマップを隠す</label>
-<label><input type="checkbox" name="hidden_empty" value="on" <?php echo ($hidden_empty)? 'checked': '';?>>予定の無いカラムを隠す</label>
-<input type="submit" value="表示">
+<label><input type="checkbox" name="hidden_roadmap" value="on" <?php echo ($hidden_roadmap)? 'checked': '';?>><?php echo plugin_lang_get( 'search_hide_roadmap' );?></label>
+<label><input type="checkbox" name="hidden_empty" value="on" <?php echo ($hidden_empty)? 'checked': '';?>><?php echo plugin_lang_get( 'search_hide_empty_tickets' );?></label>
+<input type="submit" value="<?php echo plugin_lang_get( 'search_submit' );?>">
 </form>
 </div>
 
