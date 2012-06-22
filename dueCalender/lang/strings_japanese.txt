@@ -13,3 +13,4 @@ $s_plugin_dueCalender_search = '検索';
 $s_plugin_dueCalender_search_submit = '表示';
 $s_plugin_dueCalender_search_hide_roadmap = 'ロードマップを隠す';
 $s_plugin_dueCalender_search_hide_empty_tickets = '予定の無いカラムを隠す';
+$s_plugin_dueCalender_ical_export = 'iCal エクスポート';

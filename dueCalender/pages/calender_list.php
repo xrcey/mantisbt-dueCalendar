@@ -8,6 +8,9 @@ require_once( 'string_api.php' );
 require_once( 'last_visited_api.php' );
 
 $scriptname = plugin_page( 'calender_list.php' );
+$user_id = auth_get_current_user_id();
+$t_username = user_get_row($user_id);
+
 $time = time();
 $toyear = date('Y', $time);
 $tomonth = date('m', $time);
@@ -21,6 +24,9 @@ $t_bug_table = db_get_table( 'mantis_bug_table' );
 $t_bugnote_order = current_user_get_pref( 'bugnote_order' );
 $year = gpc_get_int( 'start_year', $toyear);
 $month = gpc_get_int( 'start_month', $tomonth);
+$ical_path = config_get( 'path' ) . 'plugins' . DIRECTORY_SEPARATOR . $plugin_name . DIRECTORY_SEPARATOR . 'ical.php';
+$ical_auth_path = $ical_path . '?username=' . $t_username['username'] . '&key=' . rss_calculate_key( $user_id );
+$ical_icon_path = config_get( 'path' ) . 'plugins' . DIRECTORY_SEPARATOR . $plugin_name . DIRECTORY_SEPARATOR . 'icon.png';
 
 //options
 if ($act = gpc_get_string('act', '')) {
@@ -113,7 +119,8 @@ table.solid td > .day {
  [<a href="<?php echo $scriptname.'?start_year='.$calendarHandler['prev']['year'].'&start_month='.$calendarHandler['prev']['month'].''?>"><?php echo plugin_lang_get( 'link_prev_month' );?></a>] |<!--
 --> [<a href="<?php echo $scriptname.'?start_year='.$calendarHandler['next']['year'].'&start_month='.$calendarHandler['next']['month'].''?>"><?php echo plugin_lang_get( 'link_next_month' );?></a>]
 </span>
-<span onclick="toggleDisplay('search_form_field')" style="cursor:pointer;">[<?php echo plugin_lang_get( 'search' );?>]</span>
+<span onclick="toggleDisplay('search_form_field')" style="cursor:pointer;"><img src="images/plus.png" alt="+" id="dueCalenderSearchIcon">&#160;<?php echo plugin_lang_get( 'search' );?></span>
+[<a href="<?php echo $ical_auth_path; ?>"><img src="<?php echo $ical_icon_path?>" width="16" height="16" alt="iCalendar">&#160;<?php echo plugin_lang_get('ical_export');?></a>]
 </div>
 
 <div id="search_form_field" style="display:none;">
@@ -188,5 +195,4 @@ if( bug_is_resolved( $v3_bug_id ) ) {
 </td></tr>
 <?php endforeach;?>
 </table>
-<?php ?>
 <?php html_page_bottom();?>

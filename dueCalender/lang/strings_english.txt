@@ -13,3 +13,4 @@ $s_plugin_dueCalender_search = 'Search';
 $s_plugin_dueCalender_search_submit = 'display';
 $s_plugin_dueCalender_search_hide_roadmap = 'Hide Roadmap';
 $s_plugin_dueCalender_search_hide_empty_tickets = 'Hide empty columns';
+$s_plugin_dueCalender_ical_export = 'iCal Export';
